@@ -1,0 +1,25 @@
+#+title: Plan for UIUC PCB Keychain
+#+options: toc:nil
+
+* PCB configuration
+  | Property       | Value                  |
+  |----------------+------------------------|
+  | Dimensions     | 30mm x 40mm        |
+  | Layers         | 2                      |
+  | Thickness      | 1.6mm                  |
+  | PCB Color      | Green                  |
+  | Silkscreen     | None                   |
+  | Surface Finish | ENIG                   |
+  | Keyring drill  | 3.2mm NPTH             |
+
+* Design
+  - [X] Block I shaped routed board outline
+  - [X] Rounded outside and inside corners
+  - [X] Keyring hole in upper bar
+  - [X] Green Block I front with an exposed gold bird outline traced from website/pics/birb.png
+  - [X] Inset gold circuit artwork and hole surround on back; no perimeter border
+  - [X] Text-free gold circuit artwork on back
+  - [X] Editable KiCad project and reproducible generator
+  - [X] DRC and front/back rendered previews
+  - [X] Gerbers, NPTH drill, fabrication ZIP
+  - [ ] Physical prototype and keyring wear test
