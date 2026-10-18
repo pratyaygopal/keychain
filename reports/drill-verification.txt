@@ -1,0 +1,7 @@
+Verified both fabrication ZIPs: 8 files at archive root.
+Exactly one populated drill file: uiuc-keychain-NPTH.drl
+Exactly one non-plated circular hole, diameter 3.200 mm.
+Excellon coordinate X124.800 Y-85.200 mm.
+Hole center: 5.200 mm from right bound; 5.200 mm from top bound.
+Drill coordinates and diameter match the editable KiCad board.
+Empty plated-hole drill file omitted from upload ZIPs.
