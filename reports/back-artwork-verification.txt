@@ -1,0 +1,7 @@
+Back copper and mask openings form a single connected, hole-free motif.
+Solid terminals: 1.60 mm copper diameter / 1.20 mm exposed gold diameter.
+Traces: 0.80 mm copper width / 0.40 mm exposed gold width.
+Mask openings have at least 0.19 mm verified copper overlap (0.20 mm nominal).
+All back artwork lies at least 2.00 mm inside the routed outline.
+Ten branches checked with at least 0.60 mm copper clearance outside chip joins.
+Routed board bounds verified as 30.00 x 40.00 mm.

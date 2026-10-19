@@ -5,13 +5,13 @@
       "Application": "Pcbnew",
       "Version": "10.0.7"
     },
-    "CreationDate": "2026-10-17T22:35:06-05:00"
+    "CreationDate": "2026-10-19T11:50:29-05:00"
   },
   "GeneralSpecs": {
     "ProjectId": {
       "Name": "uiuc-keychain",
       "GUID": "75697563-2d6b-4657-9963-6861696e2e6b",
-      "Revision": "1.9"
+      "Revision": "2.0"
     },
     "Size": {
       "X": 30.05,

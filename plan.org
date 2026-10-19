@@ -17,7 +17,10 @@
   - [X] Rounded outside and inside corners
   - [X] Keyring hole in upper bar
   - [X] Green Block I front with an exposed gold bird outline traced from website/pics/birb.png
-  - [X] Inset gold circuit artwork and hole surround on back; no perimeter border
+  - [X] Inset gold circuit artwork on back; no perimeter border or hole-surround ring
+  - [X] Solid terminals and chip, 0.8mm copper traces and 0.4mm mask openings
+  - [X] Regular 2mm lead pitch and 45-degree routing; no hollow back artwork
+  - [X] Verify back mask overlap, branch spacing, and 2mm edge clearance
   - [X] Text-free gold circuit artwork on back
   - [X] Editable KiCad project and reproducible generator
   - [X] DRC and front/back rendered previews

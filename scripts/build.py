@@ -13,7 +13,7 @@ b.GetDesignSettings().m_CopperEdgeClearance = p.FromMM(0.5)
 b.GetDesignSettings().m_HoleClearance = p.FromMM(0.5)
 title = b.GetTitleBlock()
 title.SetTitle('UIUC Block I PCB Keychain')
-title.SetRevision('1.9')
+title.SetRevision('2.0')
 title.SetComment(0, 'Decorative PCB; green mask, ENIG bird and circuit artwork; no assembly')
 b.SetTitleBlock(title)
 
@@ -97,65 +97,61 @@ b.Add(z)
 bird = bird_mask(ROOT / 'assets/birb.png',p,v,(W/2,H/2),width=12.0)
 polygon(bird,p.F_Mask)
 
-# Reverse: floating circuit artwork and hole surround, with no perimeter border.
-for layer, width in [(p.B_Cu,0.65),(p.B_Mask,0.5)]:
-    s=p.PCB_SHAPE(); s.SetShape(p.SHAPE_T_CIRCLE)
-    s.SetCenter(v(HOLE)); s.SetEnd(v((HOLE[0]+2.55,HOLE[1])))
-    s.SetLayer(layer); s.SetWidth(p.FromMM(width)); b.Add(s)
+# Regular back artwork: solid chip and terminals with generous mask overlap.
+# Trace copper is 0.80 mm wide; exposed gold is 0.40 mm wide. Terminal
+# diameters are 1.60 mm copper / 1.20 mm mask. Nothing here is a drill or via.
+TRACE_COPPER = 0.80
+TRACE_GOLD = 0.40
 
-# Text-free circuit artwork: a chamfered chip with radiating 45-degree traces.
-# These are copper graphics, not a functional circuit or actual drilled vias.
-def gold_path(points, width=0.34):
-    for a, c in zip(points, points[1:]):
-        line(a,c,p.B_Cu,width+0.14)
-        line(a,c,p.B_Mask,width)
+def gold_path(points):
+    for a, c in zip(points,points[1:]):
+        dx,dy = abs(c[0]-a[0]),abs(c[1]-a[1])
+        assert dx < 1e-8 or dy < 1e-8 or abs(dx-dy) < 1e-8, 'Use 45-degree routing'
+        line(a,c,p.B_Cu,TRACE_COPPER)
+        line(a,c,p.B_Mask,TRACE_GOLD)
 
-def terminal(pt, radius=0.58):
-    for layer, width in [(p.B_Cu,0.38),(p.B_Mask,0.24)]:
+def terminal(pt):
+    for layer,radius in [(p.B_Cu,0.80),(p.B_Mask,0.60)]:
         s=p.PCB_SHAPE(); s.SetShape(p.SHAPE_T_CIRCLE)
         s.SetCenter(v(pt)); s.SetEnd(v((pt[0]+radius,pt[1])))
-        s.SetLayer(layer); s.SetWidth(p.FromMM(width)); b.Add(s)
+        s.SetFilled(True); s.SetWidth(0); s.SetLayer(layer); b.Add(s)
 
-cx = W/2
-chip = [(cx-2.1,17.2),(cx+2.1,17.2),(cx+2.8,17.9),
-        (cx+2.8,22.1),(cx+2.1,22.8),(cx-2.1,22.8),
-        (cx-2.8,22.1),(cx-2.8,17.9),(cx-2.1,17.2)]
-gold_path(chip,0.42)
-gold_path([(cx,18.5),(cx+1.5,20),(cx,21.5),(cx-1.5,20),(cx,18.5)],0.28)
-terminal((cx,20),0.36)
+def chip(inset):
+    left,right,top,bottom = 12+inset,18-inset,17+inset,23-inset
+    bevel=0.8
+    poly=p.SHAPE_POLY_SET(); poly.NewOutline()
+    for pt in [(left+bevel,top),(right-bevel,top),(right,top+bevel),
+               (right,bottom-bevel),(right-bevel,bottom),(left+bevel,bottom),
+               (left,bottom-bevel),(left,top+bevel)]:
+        q=v(pt); poly.Append(q.x,q.y)
+    return poly
 
+# A filled chamfered square replaces the hollow chip frame and inner rings.
+polygon(chip(0.0),p.B_Cu)
+polygon(chip(0.25),p.B_Mask)
+
+# Three evenly spaced top/bottom leads; two evenly spaced side leads.
+# The gold hole-surround and small disconnected satellite traces are omitted.
 top_paths = [
-    [(cx-1.8,17.2),(cx-1.8,14.0),(9.25,11.25),(9.25,7.0),(6.25,4.0),(3.8,4.0)],
-    [(cx-0.6,17.2),(cx-0.6,12.5),(11.65,10.9),(11.65,5.6),(10.05,4.0)],
-    [(cx+0.6,17.2),(cx+0.6,11.0),(13.65,10.2),(13.65,3.8),(14.15,3.3)],
-    [(cx+1.8,17.2),(cx+1.8,14.0),(18.45,11.2),(18.45,8.7),(16.75,7.0),(16.75,4.7)],
+    [(13,17.5),(13,13),(10,10),(10,7),(7,4),(4,4)],
+    [(15,17.5),(15,4)],
+    [(17,17.5),(17,13),(20,10),(20,7)],
 ]
 for path in top_paths:
     gold_path(path); terminal(path[-1])
-    reflected = [(x,H-y) for x,y in path]
+    reflected=[(x,H-y) for x,y in path]
+    if path is top_paths[-1]:
+        reflected += [(23,36),(26,36)]
     gold_path(reflected); terminal(reflected[-1])
 
 side_paths = [
-    [(cx-2.8,18.2),(9.7,18.2),(8.8,17.3),(8.8,15.5)],
-    [(cx-2.8,19.4),(9.6,19.4),(8.85,20.15)],
-    [(cx-2.8,20.6),(10.1,20.6),(8.8,21.9)],
-    [(cx-2.8,21.8),(10.1,21.8),(8.8,23.1),(8.8,25.0)],
+    [(12.5,19),(10,19),(9.5,18.5),(9.5,16)],
+    [(12.5,21),(10,21),(9.5,21.5),(9.5,24)],
 ]
 for path in side_paths:
-    # Follow the wider shoulders while retaining the circuit's masked margin.
-    shoulder_shift = SHOULDER - 2.116667*SCALE
-    path = [path[0]] + [(x+shoulder_shift,y) for x,y in path[1:]]
-    gold_path(path,0.28); terminal(path[-1],0.43)
-    reflected = [(W-x,y) for x,y in path]
-    gold_path(reflected,0.28); terminal(reflected[-1],0.43)
-
-# Short satellite traces occupy the wide end bars without approaching the hole.
-for path in [
-    [(3.8,7.2),(6.4,7.2),(7.5,8.3)],
-    [(W-3.8,32.6),(W-6.4,32.6),(W-7.6,33.8)],
-    [(W-3.8,35.6),(W-5.6,35.6),(W-7.2,37.2),(W-9.2,37.2)],
-]:
-    gold_path(path,0.28); terminal(path[0],0.45); terminal(path[-1],0.45)
+    gold_path(path); terminal(path[-1])
+    reflected=[(W-x,y) for x,y in path]
+    gold_path(reflected); terminal(reflected[-1])
 
 p.ZONE_FILLER(b).Fill(b.Zones())
 p.SaveBoard(str(BOARD), b)

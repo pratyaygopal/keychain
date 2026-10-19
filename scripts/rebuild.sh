@@ -7,6 +7,7 @@ KICAD_PYTHON=${KICAD_PYTHON:-/Applications/KiCad/KiCad.app/Contents/Frameworks/P
 BOARD=kicad/uiuc-keychain.kicad_pcb
 mkdir -p kicad/gerber preview reports
 "$KICAD_PYTHON" scripts/build.py
+"$KICAD_PYTHON" scripts/verify_back_artwork.py
 "$KICAD_CLI" pcb drc --exit-code-violations -o reports/drc.rpt "$BOARD"
 "$KICAD_CLI" pcb export gerbers --layers F.Cu,B.Cu,F.Mask,B.Mask,F.SilkS,B.SilkS,Edge.Cuts --no-netlist -o kicad/gerber/ "$BOARD"
 "$KICAD_CLI" pcb export drill --format excellon --drill-origin absolute --excellon-separate-th --excellon-units mm --excellon-zeros-format decimal --generate-map --map-format svg -o kicad/gerber/ "$BOARD"
